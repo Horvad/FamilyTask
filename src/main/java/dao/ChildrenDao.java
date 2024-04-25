@@ -9,7 +9,9 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-
+/**
+ * Реализация интерфейса IChildrenDao{@see dao.api.IChildrenDao} с использованием PostgresSQL
+ */
 public class ChildrenDao implements IChildrenDao {
     private final IDataSourceWrapper ds;
 
@@ -21,6 +23,44 @@ public class ChildrenDao implements IChildrenDao {
             "INSERT INTO app.children (name, version)" +
             "VALUES(?,?);";
 
+    private final String UPDATE_SQL = "" +
+            "UPDATE app.children " +
+            "SET name = ?, version = ? " +
+            "WHERE id = ? AND version = ?;";
+
+    private final String DELETE_SQL = "" +
+            "DELETE FROM app.children " +
+            "WHERE id= ? AND version = ?; ";
+
+    private final String GET_ID = "SELECT id, version, name, parents " +
+            "FROM app.children FULL OUTER JOIN " +
+            "(SELECT id_children, array_agg(id_parent) AS parents " +
+            "FROM app.children_parent_cross " +
+            "GROUP BY id_children) parent_arr " +
+            "ON id = id_children " +
+            "WHERE id = ?;";
+
+    private final String GET_ALL = "" +
+            "SELECT id, version, name, parents " +
+            "FROM app.children FULL OUTER JOIN " +
+            "(SELECT id_children, array_agg(id_parent) AS parents " +
+            "FROM app.children_parent_cross " +
+            "GROUP BY id_children) parent_arr " +
+            "ON id = id_children; ";
+
+    private final String ADD_PARENT = "" +
+            "INSERT INTO app.children_parent_cross (id_children, id_parent) " +
+            "VALUES(?,?)";
+
+    private final String DELETE_CHILDREN_SQL = "" +
+            "DELETE FROM app.children_parent_cross " +
+            "WHERE id_children = ? ";
+
+
+    /**
+     * создание сущности
+     * @param childrenEntity
+     */
     @Override
     public void create(ChildrenEntity childrenEntity) {
         try (Connection con = ds.getConnection();
@@ -39,10 +79,14 @@ public class ChildrenDao implements IChildrenDao {
             throw new RuntimeException(e);
         }
     }
-    private final String UPDATE_SQL = "" +
-            "UPDATE app.children " +
-            "SET name = ?, version = ? " +
-            "WHERE id = ? AND version = ?;";
+
+    /**
+     * обновление сущности
+     * @param id - актуальная версия сущности, если весия переданная и хранящаяяся в базе не совпадают,
+     *           то обновления не произойдет
+     * @param version
+     * @param childrenEntity
+     */
     @Override
     public void update(long id, long version, ChildrenEntity childrenEntity) {
         try (Connection con = ds.getConnection();
@@ -64,9 +108,12 @@ public class ChildrenDao implements IChildrenDao {
         }
     }
 
-    private final String DELETE_SQL = "" +
-            "DELETE FROM app.children " +
-            "WHERE id= ? AND version = ?; ";
+    /**
+     * удаление сущности
+     * @param id
+     * @param version - актуальная версия сущности, если весия переданная и хранящаяяся в базе не совпадают,
+     *                то обновления не произойдет
+     */
     @Override
     public void delete(long id, long version) {
         ChildrenEntity children = get(id);
@@ -85,13 +132,11 @@ public class ChildrenDao implements IChildrenDao {
         }
     }
 
-    private final String GET_ID = "SELECT id, version, name, parents " +
-            "FROM app.children FULL OUTER JOIN " +
-            "(SELECT id_children, array_agg(id_parent) AS parents " +
-            "FROM app.children_parent_cross " +
-            "GROUP BY id_children) parent_arr " +
-            "ON id = id_children " +
-            "WHERE id = ?;";
+    /**
+     * получение сущности по id
+     * @param id
+     * @return
+     */
     @Override
     public ChildrenEntity get(long id) {
         try (Connection con = ds.getConnection();
@@ -119,13 +164,10 @@ public class ChildrenDao implements IChildrenDao {
         }
     }
 
-    private final String GET_ALL = "" +
-            "SELECT id, version, name, parents " +
-            "FROM app.children FULL OUTER JOIN " +
-            "(SELECT id_children, array_agg(id_parent) AS parents " +
-            "FROM app.children_parent_cross " +
-            "GROUP BY id_children) parent_arr " +
-            "ON id = id_children; ";
+    /**
+     * получение всех сущностей
+     * @return
+     */
     @Override
     public List<ChildrenEntity> getAll() {
         try (Connection con = ds.getConnection();
@@ -145,7 +187,11 @@ public class ChildrenDao implements IChildrenDao {
             throw new RuntimeException(e);
         }
     }
-
+    /**
+     * Проверка есть ли сущность в БД
+     * @param id
+     * @return
+     */
     @Override
     public boolean exist(long id) {
         if(get(id)!=null)
@@ -153,9 +199,6 @@ public class ChildrenDao implements IChildrenDao {
         return false;
     }
 
-    private final String ADD_PARENT = "" +
-            "INSERT INTO app.children_parent_cross (id_children, id_parent) " +
-            "VALUES(?,?)";
     private void addParent(long idChildren, long idParent){
         try (Connection con = ds.getConnection();
              PreparedStatement ps = con.prepareStatement(ADD_PARENT);){
@@ -166,10 +209,6 @@ public class ChildrenDao implements IChildrenDao {
             throw new RuntimeException(e);
         }
     }
-
-    private final String DELETE_CHILDREN_SQL = "" +
-            "DELETE FROM app.children_parent_cross " +
-            "WHERE id_children = ? ";
     private void deleteParent(long idChildren){
         try (Connection con = ds.getConnection();
              PreparedStatement ps = con.prepareStatement(DELETE_CHILDREN_SQL)){

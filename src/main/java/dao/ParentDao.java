@@ -10,6 +10,10 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Реализация интерфейса IParentDao{@see dao.api.IParentDao} с использованием PostgresSQL
+ */
+
 public class ParentDao implements IParentDao {
     private final IDataSourceWrapper ds;
 
@@ -18,7 +22,27 @@ public class ParentDao implements IParentDao {
     }
 
     private String CREATE_SQL = "INSERT INTO app.parent (name, id_address, version) VALUES(?,?,?);";
+    private String UPDATE_SQL = "" +
+            "UPDATE app.parent " +
+            "SET name = ?, id_address = ?, version = ? " +
+            "WHERE id = ? AND version = ?";
 
+    private final String DELETE_SQL =
+            "DELETE FROM app.parent WHERE id = ? AND version = ?";
+
+    private final String GET_ID_SQL =
+            "SELECT id, version, name, id_address " +
+                    "FROM app.parent " +
+                    "WHERE id = ?";
+
+    private final String GET_ALL_SQL =
+            "SELECT id, version, name, id_address " +
+                    "FROM app.parent";
+
+    /**
+     * содание сущности
+     * @param parentEntity
+     */
     @Override
     public void create(ParentEntity parentEntity) {
         try (Connection conn = ds.getConnection();
@@ -33,10 +57,13 @@ public class ParentDao implements IParentDao {
         }
     }
 
-    private String UPDATE_SQL = "" +
-            "UPDATE app.parent " +
-            "SET name = ?, id_address = ?, version = ? " +
-            "WHERE id = ? AND version = ?";
+    /**
+     * обновление сущности
+     * @param id
+     * @param version - актуальная версия объекта, если версии переданные в метод
+     *                  и находящиется в хранилище, то дейсвия проводить нельзя
+     * @param parentEntity
+     */
     @Override
     public void update(long id, long version, ParentEntity parentEntity) {
         try (Connection conn = ds.getConnection();
@@ -53,8 +80,12 @@ public class ParentDao implements IParentDao {
         }
     }
 
-    private final String DELETE_SQL =
-            "DELETE FROM app.parent WHERE id = ? AND version = ?";
+    /**
+     * удаление сущности
+     * @param id
+     * @param version - актуальная версия объекта, если версии переданные в метод
+     *                и находящиется в хранилище, то дейсвия проводить нельзя
+     */
     @Override
     public void delete(long id, long version) {
         try (Connection conn = ds.getConnection();
@@ -67,10 +98,11 @@ public class ParentDao implements IParentDao {
         }
     }
 
-    private final String GET_ID_SQL =
-            "SELECT id, version, name, id_address " +
-                    "FROM app.parent " +
-                    "WHERE id = ?";
+    /**
+     * получение сущности по id
+     * @param id
+     * @return
+     */
     @Override
     public ParentEntity get(long id) {
         try (Connection connection = ds.getConnection();
@@ -93,9 +125,10 @@ public class ParentDao implements IParentDao {
         return null;
     }
 
-    private final String GET_ALL_SQL =
-            "SELECT id, version, name, id_address " +
-                    "FROM app.parent";
+    /**
+     * получение всех сущностей
+     * @return
+     */
     @Override
     public List<ParentEntity> getAll() {
         List<ParentEntity> parentEntities = new ArrayList<>();
@@ -120,6 +153,11 @@ public class ParentDao implements IParentDao {
         return parentEntities;
     }
 
+    /**
+     * проверка еслть ли id в БД
+     * @param id
+     * @return
+     */
     @Override
     public boolean exist(long id) {
         if(get(id)==null){

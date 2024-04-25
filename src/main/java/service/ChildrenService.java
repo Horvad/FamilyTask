@@ -14,11 +14,20 @@ public class ChildrenService implements IChildrenService {
     private final IChildrenDao dao;
     private final IParentService parentService;
 
+    /**
+     * Хранилище данных и родительский сервис с которыми работает данный клас
+     */
     public ChildrenService(IChildrenDao dao, IParentService parentService) {
         this.dao = dao;
         this.parentService = parentService;
     }
 
+    /**
+     * Создание {@link dao.entity.ChildrenEntity} из {@param childrenCreateDTO} при валидности
+     * addressCreateDTO
+     * @param childrenCreateDTO
+     * @exception IllegalArgumentException
+     */
     @Override
     public void create(ChildrenCreateDTO childrenCreateDTO) {
         validate(childrenCreateDTO);
@@ -30,6 +39,14 @@ public class ChildrenService implements IChildrenService {
         ));
     }
 
+    /**
+     * обновление объекта {@link dao.entity.ChildrenEntity} ключами {@param childrenCreateDTO}
+     * при валидности версии, id, addressCreateDTO
+     * @param id
+     * @param version - актуальная версия переменной
+     * @param childrenCreateDTO
+     * @exception IllegalArgumentException
+     */
     @Override
     public void update(long id, long version, ChildrenCreateDTO childrenCreateDTO) {
         validate(childrenCreateDTO);
@@ -45,6 +62,12 @@ public class ChildrenService implements IChildrenService {
         dao.update(id,version,children);
     }
 
+    /**
+     * удаление ребенка с данным id при валидности версии
+     * @param id
+     * @param version - - текущая версия объекта
+     * @exception IllegalArgumentException
+     */
     @Override
     public void delete(long id, long version) {
         ChildrenEntity children = dao.get(id);
@@ -58,6 +81,12 @@ public class ChildrenService implements IChildrenService {
         }
     }
 
+    /**
+     * Получение {@link core.viewDTO.ChildrenViewDTO} по id
+     * @param id
+     * @return
+     * @exception IllegalArgumentException
+     */
     @Override
     public ChildrenViewDTO get(long id) {
         ChildrenEntity children = dao.get(id);
@@ -71,6 +100,10 @@ public class ChildrenService implements IChildrenService {
         );
     }
 
+    /**
+     * получение всех детей из хранилища
+     * @return
+     */
     @Override
     public List<ChildrenViewDTO> getAll() {
         List<ChildrenEntity> childrenEntities = dao.getAll();
@@ -86,6 +119,11 @@ public class ChildrenService implements IChildrenService {
         return childrenViewDTOS;
     }
 
+    /**
+     * проверка на присутсвие в хранилище id
+     * @param id
+     * @return
+     */
     @Override
     public boolean exist(long id) {
         return dao.exist(id);

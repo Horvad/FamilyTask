@@ -9,18 +9,46 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Реализация интерфейса IAddressDao{@see dao.api.IAddressDao} с использованием PostgresSQL
+ */
 public class AddressDao implements IAddressDao {
     private final IDataSourceWrapper ds;
     private final String CREATE_SQL =
             "INSERT INTO app.address (street, number_house, number_flat, version) " +
                     "VALUES(?,?,?,?)";
 
+    private final String UPDATE_SQL =
+            "UPDATE app.address SET " +
+                    "street = ?, " +
+                    "number_house = ?, " +
+                    "number_flat = ?, " +
+                    "version = ? " +
+                    "WHERE id = ? AND version = ?;";
 
+    private final String DELETE_SQL =
+            "DELETE FROM app.address WHERE id = ? AND version = ?";
 
+    private final String GET_ID_SQL =
+            "SELECT id, version, street, number_house, number_flat " +
+                    "FROM app.address " +
+                    "WHERE id = ?;";
+
+    private final String GET_ALL_SQL =
+            "SELECT id, version, street, number_house, number_flat FROM app.address;";
+
+    /**
+     *
+     * @param dataSourceWrapper - текущий dataSource
+     */
     public AddressDao(IDataSourceWrapper dataSourceWrapper) {
         this.ds = dataSourceWrapper;
     }
+
+    /**
+     * Создание сущности адрес
+     * @param addressEntity
+     */
     @Override
     public void create(AddressEntity addressEntity) {
         try (Connection connection = ds.getConnection();
@@ -36,13 +64,13 @@ public class AddressDao implements IAddressDao {
         }
     }
 
-    private final String UPDATE_SQL =
-            "UPDATE app.address SET " +
-                    "street = ?, " +
-                    "number_house = ?, " +
-                    "number_flat = ?, " +
-                    "version = ? " +
-                    "WHERE id = ? AND version = ?;";
+    /**
+     * обновление сущности адрес
+     * @param id
+     * @param version - актуальная версия сущности, если весия переданная и хранящаяяся в базе не совпадают,
+     *                то обновления не произойдет
+     * @param addressEntity
+     */
     @Override
     public void update(long id, long version, AddressEntity addressEntity) {
         try (Connection connection = ds.getConnection();
@@ -60,8 +88,12 @@ public class AddressDao implements IAddressDao {
         }
     }
 
-    private final String DELETE_SQL =
-            "DELETE FROM app.address WHERE id = ? AND version = ?";
+    /**
+     * удаление сущности
+     * @param id
+     * @param version - актуальная версия сущности, если весия переданная и
+     *                хранящаяяся в базе не совпадают, то удаления не произойдет
+     */
     @Override
     public void delete(long id, long version) {
         try (Connection connection = ds.getConnection();
@@ -74,10 +106,11 @@ public class AddressDao implements IAddressDao {
         }
     }
 
-    private final String GET_ID_SQL =
-            "SELECT id, version, street, number_house, number_flat " +
-                    "FROM app.address " +
-                    "WHERE id = ?;";
+    /**
+     * полечение сущности по id
+     * @param id
+     * @return
+     */
     @Override
     public AddressEntity get(long id) {
         AddressEntity addressEntity = null;
@@ -101,8 +134,10 @@ public class AddressDao implements IAddressDao {
         return addressEntity;
     }
 
-    private final String GET_ALL_SQL =
-            "SELECT id, version, street, number_house, number_flat FROM app.address;";
+    /**
+     * полечение всез сущностей
+     * @return
+     */
     @Override
     public List<AddressEntity> getAll() {
         List<AddressEntity> addressEntities = new ArrayList<>();
@@ -129,6 +164,11 @@ public class AddressDao implements IAddressDao {
         return addressEntities;
     }
 
+    /**
+     * проверка есть ли в БД данный id
+     * @param id
+     * @return
+     */
     @Override
     public boolean exist(long id) {
         AddressEntity addressEntity = get(id);

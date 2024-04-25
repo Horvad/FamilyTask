@@ -3,7 +3,7 @@ package service;
 import core.FamilyAddressDTO;
 import core.FamilyDTOChildren;
 import core.FamilyDTOParent;
-import core.ParentFromFamilyDTO;
+import core.ParentFromFamilyChildrenDTO;
 import dao.api.IFamilyDao;
 import dao.entity.AddressEntity;
 import dao.entity.ChildrenEntity;
@@ -17,7 +17,11 @@ import service.api.IParentService;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Сервис для получения полной информации по id
+ */
 public class FamilyService implements IFamilyService {
+
     private final IFamilyDao dao;
     private final IAddressService addressService;
     private final IChildrenService childrenService;
@@ -33,6 +37,12 @@ public class FamilyService implements IFamilyService {
         this.parentService = parentService;
     }
 
+    /**
+     * Получение по id полной информации о родителе
+     * @param id
+     * @return {@link core.FamilyDTOParent}
+     * @exception IllegalArgumentException
+     */
     @Override
     public FamilyDTOParent getFromParent(long id) {
         if(!parentService.exist(id))
@@ -55,15 +65,21 @@ public class FamilyService implements IFamilyService {
         return familyDTOParent;
     }
 
+    /**
+     * Получение по id полной информации о ребенке
+     * @param id
+     * @return {@link core.FamilyDTOChildren}
+     * @exception IllegalArgumentException
+     */
     @Override
     public FamilyDTOChildren getFromChildren(long id) {
             if(!childrenService.exist(id))
             throw new IllegalArgumentException("Данного id не существует");
         FamilyEntity entity = dao.getFromChildren(id);
         String name = entity.getChildren().get(0).getName();
-        List<ParentFromFamilyDTO> listParent = new ArrayList<>();
+        List<ParentFromFamilyChildrenDTO> listParent = new ArrayList<>();
         for(ParentEntity parentEntity : entity.getParent()){
-            ParentFromFamilyDTO parent = new ParentFromFamilyDTO();
+            ParentFromFamilyChildrenDTO parent = new ParentFromFamilyChildrenDTO();
             parent.setName(parentEntity.getName());
             for(AddressEntity addressEntity : entity.getAddress()){
                 if(addressEntity.getId().equals(parentEntity.getAddress())){
@@ -78,6 +94,12 @@ public class FamilyService implements IFamilyService {
         return new FamilyDTOChildren(name,listParent);
     }
 
+    /**
+     * Получение по id полной информации о адресе
+     * @param id
+     * @return {@link core.FamilyAddressDTO}
+     * @exception IllegalArgumentException
+     */
     @Override
     public FamilyAddressDTO getFromAddress(long id) {
         if(!addressService.exist(id))

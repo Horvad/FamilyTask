@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+/**
+ * Сервлет для создания, обновления, удаления, получения родителей
+ */
 @WebServlet(name = "parent_servlet", urlPatterns = "/parent")
 public class ParentServlet extends HttpServlet {
     private final IParentService parentService;
@@ -32,6 +35,21 @@ public class ParentServlet extends HttpServlet {
         );
     }
 
+    /**
+     * Получение родителей
+     * Param id - получение адреса по id
+     * param id = null - получение всех родителей
+
+     * @param req an {@link HttpServletRequest} object that contains the request the client has made of the servlet
+     * @param req an {@link HttpServletRequest} object that contains the request the client has made of the servlet
+     *
+     * @param resp an {@link HttpServletResponse} object that contains the response the servlet sends to the client
+     *
+     * @retun {@link core.viewDTO.ParentViewDTO}
+     *
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -54,6 +72,17 @@ public class ParentServlet extends HttpServlet {
         }
     }
 
+    /**
+     * создание родителя:
+     * param: name, {idAddress}
+     * преобразование в {@link core.createDTO.ParentCreateDTO}
+     * @param req an {@link HttpServletRequest} object that contains the request the client has made of the servlet
+     *
+     * @param resp an {@link HttpServletResponse} object that contains the response the servlet sends to the client
+     *
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -62,6 +91,17 @@ public class ParentServlet extends HttpServlet {
         parentService.create(getParentCreateDTO(req));
     }
 
+    /**
+     * Изменение родителя
+     * param: id, version, name, idAddress
+     * преобразование в {@link core.createDTO.ParentCreateDTO}
+     * @param req the {@link HttpServletRequest} object that contains the request the client made of the servlet
+     *
+     * @param resp the {@link HttpServletResponse} object that contains the response the servlet returns to the client
+     *
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -78,6 +118,16 @@ public class ParentServlet extends HttpServlet {
         parentService.update(id,version,parentCreateDTO);
     }
 
+    /**
+     * Удаление адреса
+     * param: id, version
+     * @param req the {@link HttpServletRequest} object that contains the request the client made of the servlet
+     *
+     * @param resp the {@link HttpServletResponse} object that contains the response the servlet returns to the client
+     *
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

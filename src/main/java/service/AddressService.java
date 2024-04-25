@@ -10,12 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AddressService implements IAddressService {
+    /**
+     * Хранилище данных с которой работает данный класс
+     */
     private final IAddressDao dao;
 
     public AddressService(IAddressDao dao) {
         this.dao = dao;
     }
 
+    /**
+     * Создание {@link dao.entity.AddressEntity} из {@param addressCreateDTO} при валидности
+     * addressCreateDTO
+     * @param addressCreateDTO
+     * @exception IllegalArgumentException
+     */
     @Override
     public void create(AddressCreateDTO addressCreateDTO) {
         validate(addressCreateDTO);
@@ -28,6 +37,14 @@ public class AddressService implements IAddressService {
         dao.create(addressEntity);
     }
 
+    /**
+     * обновление объекта {@link dao.entity.AddressEntity} ключами {@param addressCreateDTO}
+     * при валидности версии, id, addressCreateDTO
+     * @param id
+     * @param versionId - актуальная версия переменной
+     * @param addressCreateDTO
+     * @exception IllegalArgumentException
+     */
     @Override
     public void update(long id, long versionId, AddressCreateDTO addressCreateDTO) {
         validate(addressCreateDTO);
@@ -42,6 +59,12 @@ public class AddressService implements IAddressService {
         dao.update(id,versionId,addressEntity);
     }
 
+    /**
+     * удаление из бд объекта с данним id при валидности версии
+     * @param id
+     * @param versionId - актуальная версия переменной
+     * @exception IllegalArgumentException
+     */
     @Override
     public void delete(long id, long versionId) {
         AddressEntity addressEntity = dao.get(id);
@@ -52,6 +75,12 @@ public class AddressService implements IAddressService {
         dao.delete(id,versionId);
     }
 
+    /**
+     * получение {@link core.viewDTO.AddressViewDTO} их БД по id
+     * @param id
+     * @return
+     * @exception IllegalArgumentException
+     */
     @Override
     public AddressViewDTO get(long id) {
         AddressEntity addressEntity = dao.get(id);
@@ -66,6 +95,10 @@ public class AddressService implements IAddressService {
         );
     }
 
+    /**
+     * получение всех адресов из БД
+     * @return
+     */
     @Override
     public List<AddressViewDTO> getAll() {
         List<AddressEntity> addressEntities = dao.getAll();
@@ -82,6 +115,11 @@ public class AddressService implements IAddressService {
         return addressViewDTOS;
     }
 
+    /**
+     * Проверка на наличие id
+     * @param id
+     * @return
+     */
     @Override
     public boolean exist(long id) {
         return dao.exist(id);

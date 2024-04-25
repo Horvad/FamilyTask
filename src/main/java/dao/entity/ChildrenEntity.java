@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * сущность ребенка
+ */
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Getter

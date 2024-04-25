@@ -2,6 +2,9 @@ package dao.entity;
 
 import lombok.*;
 
+/**
+ * Сущность адреса
+ */
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString

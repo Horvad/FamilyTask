@@ -19,6 +19,12 @@ public class ParentService implements IParentService {
         this.addressService = addressService;
     }
 
+    /**
+     * Создание {@link dao.entity.ParentEntity} из {@param parentCreateDTO} при валидности
+     * addressCreateDTO
+     * @param parentCreateDTO
+     * @exception IllegalArgumentException
+     */
     @Override
     public void create(ParentCreateDTO parentCreateDTO) {
         validation(parentCreateDTO);
@@ -29,6 +35,14 @@ public class ParentService implements IParentService {
                 parentCreateDTO.getIdAddress()));
     }
 
+    /**
+     * обновление объекта {@link dao.entity.ParentEntity} ключами {@param childrenCreateDTO}
+     * при валидности версии, id, parentCreateDTO
+     * @param id
+     * @param version - актуальная версия переменной
+     * @param parentCreateDTO
+     * @exception IllegalArgumentException
+     */
     @Override
     public void update(long id, long version, ParentCreateDTO parentCreateDTO) {
         validation(parentCreateDTO);
@@ -42,6 +56,12 @@ public class ParentService implements IParentService {
         dao.update(id,version,parentEntity);
     }
 
+    /**
+     * удаление ребенка с данным id при валидности версии
+     * @param id
+     * @param version - - текущая версия объекта
+     * @exception IllegalArgumentException
+     */
     @Override
     public void delete(long id, long version) {
         ParentEntity parentEntity = dao.get(id);
@@ -53,6 +73,12 @@ public class ParentService implements IParentService {
         dao.delete(id,version);
     }
 
+    /**
+     * Получение {@link core.viewDTO.ParentViewDTO} по id
+     * @param id
+     * @return
+     * @exception IllegalArgumentException
+     */
     @Override
     public ParentViewDTO get(long id) {
         ParentEntity parentEntity = dao.get(id);
@@ -67,6 +93,10 @@ public class ParentService implements IParentService {
         );
     }
 
+    /**
+     * Получение всех {@link core.viewDTO.ParentViewDTO}
+     * @return
+     */
     @Override
     public List<ParentViewDTO> getAll() {
         List<ParentViewDTO> parentViewDTOS = new ArrayList<>();
@@ -83,6 +113,11 @@ public class ParentService implements IParentService {
         return parentViewDTOS;
     }
 
+    /**
+     * проверка на присутсвие в хранилище id
+     * @param id
+     * @return
+     */
     @Override
     public boolean exist(long id) {
         return dao.exist(id);

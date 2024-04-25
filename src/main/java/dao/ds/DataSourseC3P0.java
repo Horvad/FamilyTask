@@ -8,7 +8,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * Клас предназначеннный для настройки и использования ComboPooledDataSource c3p0
+ */
 public class DataSourseC3P0 implements IDataSourceWrapper {
+
+    /**
+     * название свойст настроек файла application.property
+     */
     private static final String DRIVER_CLASS_PROPERTY_NAME = "db.class";
     private static final String URL_PROPERTY_NAME = "db.url";
     private static final String USER_PROPERTY_NAME = "db.login";
@@ -16,6 +23,11 @@ public class DataSourseC3P0 implements IDataSourceWrapper {
 
     private ComboPooledDataSource cpds;
 
+    /**
+     * Создание ComboPooledDataSource с3з0 а также его настройка
+     * @param properties
+     * @throws PropertyVetoException
+     */
     public DataSourseC3P0(Properties properties) throws PropertyVetoException {
         this.cpds = new ComboPooledDataSource();
         this.cpds.setDriverClass(properties.getProperty(DRIVER_CLASS_PROPERTY_NAME));
@@ -24,11 +36,20 @@ public class DataSourseC3P0 implements IDataSourceWrapper {
         this.cpds.setPassword(properties.getProperty(PASSWORD_PROPERTY_NAME));
     }
 
+    /**
+     * Полечение connection
+     * @return
+     * @throws SQLException
+     */
     @Override
     public Connection getConnection() throws SQLException {
         return this.cpds.getConnection();
     }
 
+    /**
+     * закрытие connection
+     * @throws Exception
+     */
     @Override
     public void close() throws Exception {
         this.cpds.close();

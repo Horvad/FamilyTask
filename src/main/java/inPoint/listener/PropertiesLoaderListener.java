@@ -8,7 +8,15 @@ import jakarta.servlet.ServletContextListener;
 import java.io.*;
 import java.util.Properties;
 
+/**
+ * Класс для чения properties при инициализации программы
+ */
 public class PropertiesLoaderListener implements ServletContextListener {
+    /**
+     * Чтение property из папки conf tomcat
+     * @param sce the ServletContextEvent containing the ServletContext that is being initialized
+     *
+     */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try{
@@ -25,6 +33,11 @@ public class PropertiesLoaderListener implements ServletContextListener {
         }
     }
 
+    /**
+     * Закрытие connect DS при закрытии приложения
+     * @param sce the ServletContextEvent containing the ServletContext that is being destroyed
+     *
+     */
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         try {

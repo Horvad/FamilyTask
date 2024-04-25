@@ -2,8 +2,10 @@ package dao.entity;
 
 import lombok.*;
 
-import java.util.List;
 
+/**
+ * Сущность радителя
+ */
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Getter

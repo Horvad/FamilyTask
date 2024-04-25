@@ -28,8 +28,10 @@ import service.fabric.ParentServiceSingleton;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 
+/**
+ * получение полной информации по id ребенка, родителя или адресу
+ */
 @WebServlet(name = "FamilyServlet",urlPatterns = "/family")
 public class FamilyServlet extends HttpServlet {
     private final IFamilyService service;
@@ -60,6 +62,20 @@ public class FamilyServlet extends HttpServlet {
         );
     }
 
+    /**
+     * получение полной информации об родителе, ребенку, адересе
+     * param : id, choice
+     *
+     * @return choice = address, return {@link core.FamilyAddressDTO}
+     *         choice = children, return {@link core.FamilyDTOChildren}
+     *         choice = parent, return {@link core.FamilyDTOParent}
+     * @param req an {@link HttpServletRequest} object that contains the request the client has made of the servlet
+     *
+     * @param resp an {@link HttpServletResponse} object that contains the response the servlet sends to the client
+     *
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

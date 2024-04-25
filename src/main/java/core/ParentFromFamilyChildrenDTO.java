@@ -2,24 +2,18 @@ package core;
 
 import lombok.*;
 
-import java.util.List;
-
 /**
- * Класс предназначен для вывода родителя, имен его детей и адреса проживания
+ * Класс является частью класса FamilyDTOChildren {@link FamilyDTOChildren}
  */
 @AllArgsConstructor
 @Setter
 @Getter
 @NoArgsConstructor
-public class FamilyDTOParent {
+public class ParentFromFamilyChildrenDTO {
     /**
      * Имя
      */
     private String name;
-    /**
-     * масси имен детей
-     */
-    private List<String> childrens;
     /**
      * улица
      */

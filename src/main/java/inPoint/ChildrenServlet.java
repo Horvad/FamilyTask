@@ -21,6 +21,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Сервлет для создания, обновления, удаляние получения детей
+ */
 @WebServlet(name = "ChildrenServlet", urlPatterns = "/children")
 public class ChildrenServlet extends HttpServlet {
     private final IChildrenService service;
@@ -37,6 +40,21 @@ public class ChildrenServlet extends HttpServlet {
         );
     }
 
+    /**
+     * Получение детей
+     * Param id - получение адреса по id
+     * param id = null - получение всех детей
+
+     * @param req an {@link HttpServletRequest} object that contains the request the client has made of the servlet
+     * @param req an {@link HttpServletRequest} object that contains the request the client has made of the servlet
+     *
+     * @param resp an {@link HttpServletResponse} object that contains the response the servlet sends to the client
+     *
+     * @retun {@link core.viewDTO.ChildrenViewDTO}
+     *
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -57,6 +75,17 @@ public class ChildrenServlet extends HttpServlet {
         }
     }
 
+    /**
+     * создание ребенка:
+     * param: name, {idParents}
+     * преобразование в {@link core.createDTO.ChildrenCreateDTO}
+     * @param req an {@link HttpServletRequest} object that contains the request the client has made of the servlet
+     *
+     * @param resp an {@link HttpServletResponse} object that contains the response the servlet sends to the client
+     *
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding(CHARACTER_ENCODING);
@@ -67,6 +96,17 @@ public class ChildrenServlet extends HttpServlet {
         service.create(createDTO);
     }
 
+    /**
+     * Изменение ребенка
+     * param: id, version, name, {idParent}
+     * преобразование в {@link core.createDTO.ChildrenCreateDTO}
+     * @param req the {@link HttpServletRequest} object that contains the request the client made of the servlet
+     *
+     * @param resp the {@link HttpServletResponse} object that contains the response the servlet returns to the client
+     *
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding(CHARACTER_ENCODING);
@@ -84,6 +124,16 @@ public class ChildrenServlet extends HttpServlet {
         service.update(id,version,updateDTO);
     }
 
+    /**
+     * Удаление адреса
+     * param: id, version
+     * @param req the {@link HttpServletRequest} object that contains the request the client made of the servlet
+     *
+     * @param resp the {@link HttpServletResponse} object that contains the response the servlet returns to the client
+     *
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

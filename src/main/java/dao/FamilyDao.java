@@ -13,12 +13,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Реализация интерфейса IFamily{@see dao.api.IFamilyDao} с использованием PostgresSQL
+ */
 public class FamilyDao implements IFamilyDao {
     private final IDataSourceWrapper ds;
 
     public FamilyDao(IDataSourceWrapper dataSourceWrapper) {
         this.ds = dataSourceWrapper;
     }
+
 
     private final String GET_PARENT_SQL = "" +
             "SELECT app.parent.name, " +
@@ -34,6 +38,42 @@ public class FamilyDao implements IFamilyDao {
             "   ON id = id_parent " +
             "   FULL OUTER JOIN app.address ON app.parent.id_address = app.address.id " +
             "WHERE app.parent.id = ?;";
+    private final String GET_CHILDREN_SQL = "" +
+            "SELECT " +
+            "   app.children.id, " +
+            "   app.children.name, " +
+            "   app.parent.id AS parent_id, " +
+            "   app.parent.name AS parent_name, " +
+            "   app.parent.id_address, " +
+            "   app.address.id AS address_id, " +
+            "   app.address.street, " +
+            "   app.address.number_house, " +
+            "   app.address.number_flat " +
+            "FROM app.children" +
+            "   INNER JOIN app.children_parent_cross ON app.children.id = app.children_parent_cross.id_children " +
+            "   INNER JOIN app.parent ON app.parent.id = app.children_parent_cross.id_parent " +
+            "   INNER JOIN app.address ON app.parent.id_address = app.address.id " +
+            "WHERE app.children.id = ?;";
+
+    private final String ADDRESS_SQL = "" +
+            "SELECT " +
+            "   array_agg(app.children.name) AS children_name, " +
+            "   array_agg(app.parent.name) AS parent_name, " +
+            "   app.address.street, " +
+            "   app.address.number_house," +
+            "   app.address.number_flat " +
+            "FROM app.children " +
+            "   INNER JOIN app.children_parent_cross ON app.children.id = app.children_parent_cross.id_children " +
+            "   INNER JOIN app.parent ON app.parent.id = app.children_parent_cross.id_parent " +
+            "   INNER JOIN app.address ON app.parent.id_address = app.address.id " +
+            "GROUP BY app.address.id " +
+            "HAVING app.address.id = ?;";
+
+    /**
+     * Получение всех данных касающихся родителя с заданным id
+     * @param id
+     * @return
+     */
     @Override
     public FamilyEntity getFromParent(long id) {
         try (Connection con = ds.getConnection()){
@@ -65,22 +105,11 @@ public class FamilyDao implements IFamilyDao {
         }
     }
 
-    private final String GET_CHILDREN_SQL = "" +
-            "SELECT " +
-            "   app.children.id, " +
-            "   app.children.name, " +
-            "   app.parent.id AS parent_id, " +
-            "   app.parent.name AS parent_name, " +
-            "   app.parent.id_address, " +
-            "   app.address.id AS address_id, " +
-            "   app.address.street, " +
-            "   app.address.number_house, " +
-            "   app.address.number_flat " +
-            "FROM app.children" +
-            "   INNER JOIN app.children_parent_cross ON app.children.id = app.children_parent_cross.id_children " +
-            "   INNER JOIN app.parent ON app.parent.id = app.children_parent_cross.id_parent " +
-            "   INNER JOIN app.address ON app.parent.id_address = app.address.id " +
-            "WHERE app.children.id = ?;";
+    /**
+     * Получение всех данных касающихся ребенка с заданным id
+     * @param id
+     * @return
+     */
     @Override
     public FamilyEntity getFromChildren(long id) {
         try (Connection con = ds.getConnection()){
@@ -121,19 +150,12 @@ public class FamilyDao implements IFamilyDao {
             throw new RuntimeException(e);
         }
     }
-    private final String ADDRESS_SQL = "" +
-            "SELECT " +
-            "   array_agg(app.children.name) AS children_name, " +
-            "   array_agg(app.parent.name) AS parent_name, " +
-            "   app.address.street, " +
-            "   app.address.number_house," +
-            "   app.address.number_flat " +
-            "FROM app.children " +
-            "   INNER JOIN app.children_parent_cross ON app.children.id = app.children_parent_cross.id_children " +
-            "   INNER JOIN app.parent ON app.parent.id = app.children_parent_cross.id_parent " +
-            "   INNER JOIN app.address ON app.parent.id_address = app.address.id " +
-            "GROUP BY app.address.id " +
-            "HAVING app.address.id = ?;";
+
+    /**
+     * Получение всех данных касающихся адреса с заданным id
+     * @param id
+     * @return
+     */
     @Override
     public FamilyEntity getFromAddress(long id) {
         try (Connection con = ds.getConnection();
@@ -144,14 +166,12 @@ public class FamilyDao implements IFamilyDao {
             Array arrayChildren = rs.getArray(1);
             String[] childrenStr = (String[]) arrayChildren.getArray();
             Set<String> childrens = new HashSet<>();
-//                    Set.of((String[]) rs.getArray(1).getArray());
             for(String childrensS : childrenStr){
                 childrens.add(childrensS);
             }
             Array arrayPar = rs.getArray(2);
             String[] arrParSrt = (String[])arrayPar.getArray();
             Set<String> parents = new HashSet<>();
-//                    Set.of((String) rs.getArray(2).getArray());
             for(String strPar : arrParSrt){
                 parents.add(strPar);
             }
