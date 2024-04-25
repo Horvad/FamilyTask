@@ -24,7 +24,7 @@ public class FamilyAddressDTO {
      */
     private long numberFlat;
     /**
-     * массив имен радителей
+     * массив имен родителей
      */
     private List<String> parents;
     /**
